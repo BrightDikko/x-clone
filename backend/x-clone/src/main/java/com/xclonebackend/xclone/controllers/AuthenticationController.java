@@ -54,4 +54,12 @@ public class AuthenticationController {
         return userService.updateUser(user);
     }
 
+    @PostMapping("/email/code")
+    public ResponseEntity<String> createEmailVerificationCode(@RequestBody LinkedHashMap<String, String> body) {
+
+        userService.generateEmailVerificationCode(body.get("username"));
+
+        return new ResponseEntity<String>("Verification code generated, email sent", HttpStatus.OK);
+    }
+
 }

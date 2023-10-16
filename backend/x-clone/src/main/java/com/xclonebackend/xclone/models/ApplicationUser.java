@@ -17,13 +17,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name="users")
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 public class ApplicationUser {
 
@@ -59,4 +59,15 @@ public class ApplicationUser {
             inverseJoinColumns = {@JoinColumn(name = "role_id")}
     )
     private Set<Role> authorities;
+
+    private boolean enabled;
+
+    @Column(nullable = true)
+    @JsonIgnore
+    private Long verification;
+
+    public ApplicationUser() {
+        this.authorities = new HashSet<>();
+        this.enabled = false;
+    }
 }

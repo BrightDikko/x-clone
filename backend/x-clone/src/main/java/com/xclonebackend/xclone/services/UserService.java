@@ -71,6 +71,16 @@ public class UserService {
 
     }
 
+    public void generateEmailVerificationCode(String username) {
+        ApplicationUser user = userRepository.findByUsername(username).orElseThrow(UserDoesNotExistException::new);
+        user.setVerification(generateVerificationNumber());
+        userRepository.save(user);
+    }
+
+    private Long generateVerificationNumber() {
+        return (long) Math.floor(Math.random() * 100_000_000);
+    }
+
     private String generateUsername(String name) {
         long generatedNumber = (long) Math.floor(Math.random() * 1_000_000_000);
         return name + generatedNumber;

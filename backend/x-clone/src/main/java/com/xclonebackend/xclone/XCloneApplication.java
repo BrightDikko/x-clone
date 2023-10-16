@@ -23,14 +23,6 @@ public class XCloneApplication {
 					.roleId(1)
 					.authority("USER")
 					.build());
-
-//			ApplicationUser user = ApplicationUser
-//					.builder()
-//					.firstName("test")
-//					.lastName("test")
-//					.build();
-//
-//			userService.registerUser(user);
 		};
 	}
 
