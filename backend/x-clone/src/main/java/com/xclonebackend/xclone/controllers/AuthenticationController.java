@@ -1,6 +1,7 @@
 package com.xclonebackend.xclone.controllers;
 
 import com.xclonebackend.xclone.exceptions.EmailAlreadyTakenException;
+import com.xclonebackend.xclone.exceptions.EmailFailedToSendException;
 import com.xclonebackend.xclone.exceptions.UserDoesNotExistException;
 import com.xclonebackend.xclone.models.ApplicationUser;
 import com.xclonebackend.xclone.models.RegistrationObject;
@@ -33,6 +34,11 @@ public class AuthenticationController {
     @ExceptionHandler({UserDoesNotExistException.class})
     public ResponseEntity<String> handleUserDoesNotExist() {
         return new ResponseEntity<String>("The user you are looking for does not exist", HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler({EmailFailedToSendException.class})
+    public ResponseEntity<String> handleEmailFailedToSendException() {
+        return new ResponseEntity<String>("Email failed to send, try again in a moment", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     // go to http://localhost:8000/auth/register

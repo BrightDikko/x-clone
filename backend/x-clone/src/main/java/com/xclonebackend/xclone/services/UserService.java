@@ -1,6 +1,7 @@
 package com.xclonebackend.xclone.services;
 
 import com.xclonebackend.xclone.exceptions.EmailAlreadyTakenException;
+import com.xclonebackend.xclone.exceptions.EmailFailedToSendException;
 import com.xclonebackend.xclone.exceptions.UserDoesNotExistException;
 import com.xclonebackend.xclone.models.ApplicationUser;
 import com.xclonebackend.xclone.models.RegistrationObject;
@@ -20,6 +21,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final MailService mailService;
 
     public ApplicationUser getUserByUsername(String username) {
         return userRepository.findByUsername(username).orElseThrow(UserDoesNotExistException::new);
@@ -74,6 +76,14 @@ public class UserService {
     public void generateEmailVerificationCode(String username) {
         ApplicationUser user = userRepository.findByUsername(username).orElseThrow(UserDoesNotExistException::new);
         user.setVerification(generateVerificationNumber());
+
+        try {
+            mailService.sendEmail(user.getEmail(), "your verification code", "Here is your verification code: " + user.getVerification());
+            userRepository.save(user);
+        } catch (Exception e) {
+            throw new EmailFailedToSendException();
+        }
+
         userRepository.save(user);
     }
 
