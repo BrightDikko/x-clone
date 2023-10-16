@@ -38,7 +38,7 @@ public class ApplicationUser {
     @Column(name="last_name")
     private String lastName;
 
-    @Column(name="email")
+    @Column(unique = true)
     private String email;
 
     private String phone;
