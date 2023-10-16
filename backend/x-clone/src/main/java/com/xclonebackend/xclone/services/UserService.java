@@ -1,6 +1,7 @@
 package com.xclonebackend.xclone.services;
 
 import com.xclonebackend.xclone.exceptions.EmailAlreadyTakenException;
+import com.xclonebackend.xclone.exceptions.UserDoesNotExistException;
 import com.xclonebackend.xclone.models.ApplicationUser;
 import com.xclonebackend.xclone.models.RegistrationObject;
 import com.xclonebackend.xclone.models.Role;
@@ -19,6 +20,18 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+
+    public ApplicationUser getUserByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(UserDoesNotExistException::new);
+    }
+
+    public ApplicationUser updateUser(ApplicationUser user) {
+        try {
+            return userRepository.save(user);
+        } catch (Exception e) {
+            throw new EmailAlreadyTakenException();
+        }
+    }
 
     public ApplicationUser registerUser(RegistrationObject registrationRequest) {
 
