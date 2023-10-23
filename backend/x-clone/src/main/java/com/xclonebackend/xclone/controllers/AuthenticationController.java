@@ -2,6 +2,7 @@ package com.xclonebackend.xclone.controllers;
 
 import com.xclonebackend.xclone.exceptions.EmailAlreadyTakenException;
 import com.xclonebackend.xclone.exceptions.EmailFailedToSendException;
+import com.xclonebackend.xclone.exceptions.IncorrectVerificationCodeException;
 import com.xclonebackend.xclone.exceptions.UserDoesNotExistException;
 import com.xclonebackend.xclone.models.ApplicationUser;
 import com.xclonebackend.xclone.models.RegistrationObject;
@@ -41,6 +42,11 @@ public class AuthenticationController {
         return new ResponseEntity<String>("Email failed to send, try again in a moment", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler({IncorrectVerificationCodeException.class})
+    public ResponseEntity<String> handleIncorrectVerificationCodeException() {
+        return new ResponseEntity<String>("The code provided does not match the user's verification code", HttpStatus.CONFLICT);
+    }
+
     // go to http://localhost:8000/auth/register
     @PostMapping("/register")
     public ApplicationUser registerUser(@RequestBody RegistrationObject registrationRequest) {
@@ -68,4 +74,23 @@ public class AuthenticationController {
         return new ResponseEntity<String>("Verification code generated, email sent", HttpStatus.OK);
     }
 
+    @PostMapping("/email/verify")
+    public ApplicationUser verifyEmail(@RequestBody LinkedHashMap<String, String> body) {
+
+        Long code = Long.parseLong(body.get("code"));
+        String username = body.get("username");
+
+        ApplicationUser user = userService.getUserByUsername(username);
+
+        return userService.verifyEmail(username, code);
+    }
+
+    @PutMapping("/update/password")
+    public ApplicationUser updatePassword(@RequestBody LinkedHashMap<String, String> body) {
+
+        String username = body.get("username");
+        String password = body.get("password");
+
+        return userService.setPassword(username, password);
+    }
 }

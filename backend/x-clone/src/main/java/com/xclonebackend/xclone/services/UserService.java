@@ -8,7 +8,9 @@ import com.xclonebackend.xclone.models.RegistrationObject;
 import com.xclonebackend.xclone.models.Role;
 import com.xclonebackend.xclone.repositories.RoleRepository;
 import com.xclonebackend.xclone.repositories.UserRepository;
+import com.xclonebackend.xclone.exceptions.IncorrectVerificationCodeException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -22,6 +24,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final MailService mailService;
+    private final PasswordEncoder passwordEncoder;
 
     public ApplicationUser getUserByUsername(String username) {
         return userRepository.findByUsername(username).orElseThrow(UserDoesNotExistException::new);
@@ -96,4 +99,24 @@ public class UserService {
         return name + generatedNumber;
     }
 
+    public ApplicationUser verifyEmail(String username, Long code) {
+        ApplicationUser user = userRepository.findByUsername(username).orElseThrow(UserDoesNotExistException::new);
+
+        if (code.equals(user.getVerification())) {
+            user.setEnabled(true);
+            user.setVerification(null);
+            return userRepository.save(user);
+        } else {
+            throw new IncorrectVerificationCodeException();
+        }
+    }
+
+    public ApplicationUser setPassword(String username, String password) {
+        ApplicationUser user = userRepository.findByUsername(username).orElseThrow(UserDoesNotExistException::new);
+
+        String encodedPassword = passwordEncoder.encode(password);
+        user.setPassword(encodedPassword);
+
+        return userRepository.save(user);
+    }
 }
